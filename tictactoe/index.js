@@ -1,7 +1,7 @@
-var origBoard; //an array that keeps track of what's in each square: X, O or nothing
+var myGameBoard;
 const humanPlayer = 'O';
 const aiPlayer = 'X';
-const winCombos = [  //array thats gonna show winning combinations
+const winCombos = [
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
@@ -12,47 +12,41 @@ const winCombos = [  //array thats gonna show winning combinations
     [6, 4, 2]
 ]; 
 
-const cells = document.querySelectorAll('.tableCell'); // cells variable is going to store a reference to each element that has a class 'cell'  
-play(); // calling function to start the game
+const cells = document.querySelectorAll('.tableCell');  
+play();
 
-
-//defining the function to start the game (it will also run when clicking on the "Replay" button)
 function play() {  document.querySelector(".finish").style.display = "none"
- origBoard = Array.from(Array(9).keys()) //make the array every number from 0-9
+ myGameBoard = Array.from(Array(9).keys())
  for (var i=0; i< cells.length; i++) {
-  cells[i].innerText = ''; //there will be nothing in the cell     
-  cells[i].style.removeProperty('background-color'); // removing the background color
-  cells[i].addEventListener('click', turnClick, false); //calling the turnClick function
+  cells[i].innerText = '';
+  cells[i].style.removeProperty('background-color');
+  cells[i].addEventListener('click', turnClick, false);
     }
 } 
 
-
-//defining turnClick function
 function turnClick (square) {
-  if (typeof origBoard[square.target.id] === 'number') { //if id that was just clicked is a number, that means no one played in this spot
-    turn(square.target.id, humanPlayer) //human player taking a turn
-    if (!checkTie()) turn(bestSpot(), aiPlayer); //checking if there's a tie, if not, then the Ai Player will take a turn
+  if (typeof myGameBoard[square.target.id] === 'number') {
+    turn(square.target.id, humanPlayer)
+    if (!checkTie()) turn(bestSpot(), aiPlayer);
     }   
 } 
 
 
-//defining turn function
 function turn(squareId, player) {
-  origBoard[squareId] = player;
-    document.getElementById(squareId).innerText = player; // updating the display so we can see where player clicked
- let gameWon = checkWin(origBoard, player)
- if (gameWon) gameOver(gameWon) // whenever the turn has been taken we're going to check if the game has been won
+  myGameBoard[squareId] = player;
+    document.getElementById(squareId).innerText = player;
+ let gameWon = checkWin(myGameBoard, player)
+ if (gameWon) gameOver(gameWon)
 } 
 
 
-// defining checkWin function
 function checkWin(board, player) {
   let plays = board.reduce((a, e, i) => 
-  (e === player) ? a.concat(i) : a, []); //finding every index that the player has played
+  (e === player) ? a.concat(i) : a, []);
   let gameWon = null;
-  for (let [index, win] of winCombos.entries()) { //checking if the game has been won by looping through every winCombos
-    if (win.every(elem => plays.indexOf(elem) > -1)) { //has the player played in every spot that counts as a win for that win
-      gameWon = {index: index, player: player};  //which win combo the player won at & which player had won
+  for (let [index, win] of winCombos.entries()) {
+    if (win.every(elem => plays.indexOf(elem) > -1)) {
+      gameWon = {index: index, player: player};
       break;
     } 
 } 
@@ -81,13 +75,13 @@ function declareWinner(who) {
 
 //defining emptySuares function
 function emptySquares() {
-    return origBoard.filter(s => typeof s === 'number'); //filter every element in the origBoard to see if the type of element equals number. If yes, we are gonna return it (all the squares that are numbers are empty, the squares with X and O are not empty)
+    return myGameBoard.filter(s => typeof s === 'number'); //filter every element in the myGameBoard to see if the type of element equals number. If yes, we are gonna return it (all the squares that are numbers are empty, the squares with X and O are not empty)
 }
 
 
 //defining bestSpot function
 function bestSpot() {
-    return minimax(origBoard, aiPlayer).index; //will always play in the first empty squre
+    return minimax(myGameBoard, aiPlayer).index; //will always play in the first empty squre
 }
 
 
@@ -119,7 +113,7 @@ function minimax(newBoard, player) {
     var moves = []; //collect the scores from each of the empty spots to evaluate them later
     for (var i = 0; i < availSpots.length; i++) {
         var move = {};
-        move.index = newBoard[availSpots[i]]; //setting the index number of the empty spot, that was store as a number in the origBoard, to the index property of the move object
+        move.index = newBoard[availSpots[i]]; //setting the index number of the empty spot, that was store as a number in the myGameBoard, to the index property of the move object
         newBoard[availSpots[i]] = player; //setting empty spot on a newBoard to the current player
 
         if (player === aiPlayer) { //calling the minimax function with the other player in the newly changed newBoard
